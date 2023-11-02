@@ -1,6 +1,10 @@
 --(B) - Create all tables with their respective attributes, data types, and primary and foreign keys. Remember to properly map all relationships.
 
 
+--This code creates each table and their respective attributes. 
+--It also creates primary and foreign keys.
+-- It was imported from Lucid chart and then some names were modified with underscores.
+
 CREATE TABLE `Person` (
   `Person_ID` Integer,
   `Name` Varchar(255),
@@ -77,11 +81,11 @@ CREATE TABLE `Service Record` (
   FOREIGN KEY (`Aeroplane_ID`) REFERENCES `Aeroplane`(`Registration_Number`),
   FOREIGN KEY (`Emp_ID`) REFERENCES `Employee`(`Employee_ID`)
 ); 
-*/
+
 
 --(C) - Insert (populate) some data into your tables. Don't worry about the number of rows but make sure you have sufficient data to answer all questions. You can use any airport-like dataset as a reference.
 
--- Insert data into the Person table
+-- Inserting data into the Person table
 
 INSERT INTO Person (Person_ID, Name, Address, Phone)
 VALUES (1, 'John Doe', '123 Main St', 1234567890);
@@ -98,7 +102,7 @@ Select *
 From Person
 
 
--- Insert data into the Corporation table
+-- Inserting data into the Corporation table
 INSERT INTO Corporation (Corporation_ID, Name, Address, Phone)
 VALUES (1, 'ABC Corporation', '123 Corporate Ave', 5551234567);
 
@@ -114,7 +118,7 @@ From Corporation
 
 
 
--- Insert data into the Aeroplane table
+-- Inserting data into the Aeroplane table
 INSERT INTO Aeroplane (Registration_Number, Name, Plane_Type, Hangar_Loc, Owner_Person_ID, Owner_Corp_ID, Purchase_Date)
 VALUES (1, 'Plane 1', 1, 'Hangar A', 1, NULL, '2023-01-01');
 
@@ -131,7 +135,7 @@ Select *
 From Aeroplane
 
 
--- Insert data into the Hangar table
+-- Inserting data into the Hangar table
 INSERT INTO Hangar ("Hangar_Number", Capacity, "Hangar_Location")
 VALUES (1, 50, 'Hangar A');
 
@@ -148,7 +152,7 @@ From Hangar
 
 
 
--- Insert data into the Plane Type table
+-- Inserting data into the Plane Type table
 INSERT INTO "Plane Type" ("Model_Number", Capacity, Weight)
 VALUES (1, 200, 1500.5);
 
@@ -164,7 +168,7 @@ From "Plane Type"
 
 
 
--- Insert data into the Pilot table
+-- Inserting data into the Pilot table
 INSERT INTO Pilot ("License_Number", "Total_Hours_Flown", Restrictions)
 VALUES (101, 2000, 'None');
 
@@ -180,7 +184,7 @@ From Pilot
 
 
 
--- Insert data into the Employee table
+-- Inserting data into the Employee table
 INSERT INTO Employee ("Employee_ID", Name, Salary, "Shift_Worked")
 VALUES (201, 'Mary Johnson', 60000, 1);
 
@@ -196,7 +200,7 @@ From Employee
 
 
 
--- Insert data into the Service Record table
+-- Inserting data into the Service Record table
 INSERT INTO "Service Record" ("Service_Record_ID", "Aeroplane_ID", "Emp_ID", "Date_of_Maintenance", "Hours_Spent", "Service_Type")
 VALUES (1, 1, 201, '2023-01-10', 3, 'Regular Maintenance');
 
@@ -213,9 +217,11 @@ From "Service Record"
 
 
 
---(D) - List all aeroplanes and their owners, and whether each owner is a person or a corporation.
+--(D) - List all aeroplanes and their owners, and whether each owner is a person or a corporation:
 
-
+--I use Case to select values for person, corporation, p.name, c.name. 
+--If those are Null then it returns Unknown for that entry in the table. 
+--I also use left join so information from the aeroplane table will be given to us.
 
 SELECT
     A.Name AS Aeroplane_Name,
@@ -235,8 +241,10 @@ LEFT JOIN Corporation AS C ON A.Owner_Corp_ID = C.Corporation_ID;
 
 
 
---(E) - List all maintenance services, ordered by ascending maintenance time (number of hours).
+--(E) - List all maintenance services, ordered by ascending maintenance time (number of hours):
 
+--I just select attrributes from the entity Service Record (service type and hours spent)
+--Then I order them in ascending order by hours spent
 
 SELECT "Service_Type" AS Service_Type, "Hours_Spent" AS Hours_Spent
 FROM "Service Record"
@@ -246,13 +254,21 @@ ORDER BY "Hours_Spent" ASC;
 
 
 --(F) - List the employees and all the planes they can do maintenance work:
+
+--Here I'm selecting from teh service record table. 
+--By using inner join on the results from employee and aeroplane table with their counterparts in the service record table. 
+--Then I group the results by employee ID. 
+
+
+
 SELECT
     E.Name AS Employee_Name,
-    GROUP_CONCAT(A.Name, ', ') AS Aeroplanes_Worked_On
-FROM Employee AS E
-LEFT JOIN "Service Record" AS S ON E."Employee_ID" = S."Emp_ID"
-LEFT JOIN Aeroplane AS A ON S."Aeroplane_ID" = A."Registration_Number"
-GROUP BY E."Employee_ID";
+    A.Name AS Planes_For_Maintenance
+FROM "Service Record" AS SR
+INNER JOIN Employee AS E ON SR.Emp_ID = E.Employee_ID
+INNER JOIN Aeroplane AS A ON SR.Aeroplane_ID = A.Registration_Number
+GROUP BY E.Employee_ID;
+
 
 
 
@@ -261,6 +277,11 @@ GROUP BY E."Employee_ID";
 --Tip: what would be the most challenging update, insert, or delete operation that can compromise the consistency of your database?
 
 
+-- Rationale: What if a plane ownership is transferred between owners? We need to be able to map this change.
+
+
+--It activates after the insert operation. It updates the record if either ownership is switched between people 
+--and again if planes are transferred between corporations.
 
 
 CREATE TRIGGER IF NOT EXISTS UpdateOwnerInformation
@@ -276,10 +297,10 @@ BEGIN
 END;
 
 
+--The following are 2 situations where a plane is transferred between either people or corporations.
 
-
--- Before the transfer, John Doe owns an aeroplane.
--- Let's transfer it to Jane Smith (Person_ID 2).
+-- In the begining John Doe owns the plane.
+-- The plane is then transferred to Jane Smith (Person_ID 2).
 
 UPDATE Aeroplane
 SET Owner_Person_ID = 2
@@ -287,8 +308,8 @@ WHERE Registration_Number = 1;
 
 
 
--- Before the transfer, ABC Corporation owns an aeroplane.
--- Let's transfer it to XYZ Inc. (Corporation_ID 2).
+-- In the begining ABC Corporation owns the plane.
+-- The plane is then transferred to to XYZ Inc (Corporation_ID 2).
 
 UPDATE Aeroplane
 SET Owner_Corp_ID = 2
@@ -300,6 +321,13 @@ WHERE Registration_Number = 2;
 --You must provide a rationale/justification of the chosen view, the corresponding code, and a sample of its content (for instance, a SELECT command showing the view's content). 
 --Tip: think about the most frequent query on your database and whether this can be coded as a view. 
 --Also, remember that views are usually applied to summarise data from multiple base tables.
+
+--Rationale: An airport may want to know whether a plane has been maintained, which plane, service records and how long was spent on it if they want to calculate hourly wages.
+
+
+--First I select and rename columns from the Service record table.
+--Then I inner join the service record and aeroplane table based of the Aeroplane_ID and registration number.
+--So this provided data about each aeroplane and its associated record in the service record table.
 
 
 
@@ -315,6 +343,7 @@ INNER JOIN Aeroplane AS A ON SR."Aeroplane_ID" = A."Registration_Number";
 
 SELECT * 
 FROM ServiceHistory;
+
 
 
 
