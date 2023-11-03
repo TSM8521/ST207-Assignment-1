@@ -1,4 +1,4 @@
-Candidate number: 23007
+--Candidate number: 23007
 
 
 --(B) - Create all tables with their respective attributes, data types, and primary and foreign keys. Remember to properly map all relationships.
