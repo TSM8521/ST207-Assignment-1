@@ -118,23 +118,6 @@ From Corporation
 
 
 
--- Inserting data into the Aeroplane table
-INSERT INTO Aeroplane (Registration_Number, Name, Plane_Type, Hangar_Loc, Owner_Person_ID, Owner_Corp_ID, Purchase_Date)
-VALUES (1, 'Plane 1', 1, 'Hangar A', 1, NULL, '2023-01-01');
-
-INSERT INTO Aeroplane (Registration_Number, Name, Plane_Type, Hangar_Loc, Owner_Person_ID, Owner_Corp_ID, Purchase_Date)
-VALUES (2, 'Plane 2', 2, 'Hangar B', NULL, 1, '2023-02-01');
-
-INSERT INTO Aeroplane (Registration_Number, Name, Plane_Type, Hangar_Loc, Owner_Person_ID, Owner_Corp_ID, Purchase_Date)
-VALUES (3, 'Plane 3', 3, 'Hangar A', 2, NULL, '2023-03-01');
-
-
-
-
-Select * 
-From Aeroplane
-
-
 -- Inserting data into the Hangar table
 INSERT INTO Hangar ("Hangar_Number", Capacity, "Hangar_Location")
 VALUES (1, 50, 'Hangar A');
@@ -198,6 +181,23 @@ VALUES (203, 'Emily Davis', 62000, 1);
 Select * 
 From Employee
 
+
+
+-- Inserting data into the Aeroplane table
+INSERT INTO Aeroplane (Registration_Number, Name, Plane_Type, Hangar_Loc, Owner_Person_ID, Owner_Corp_ID, Purchase_Date)
+VALUES (1, 'Plane 1', 1, 'Hangar A', 1, NULL, '2023-01-01');
+
+INSERT INTO Aeroplane (Registration_Number, Name, Plane_Type, Hangar_Loc, Owner_Person_ID, Owner_Corp_ID, Purchase_Date)
+VALUES (2, 'Plane 2', 2, 'Hangar B', NULL, 1, '2023-02-01');
+
+INSERT INTO Aeroplane (Registration_Number, Name, Plane_Type, Hangar_Loc, Owner_Person_ID, Owner_Corp_ID, Purchase_Date)
+VALUES (3, 'Plane 3', 3, 'Hangar A', 2, NULL, '2023-03-01');
+
+
+
+
+Select * 
+From Aeroplane
 
 
 -- Inserting data into the Service Record table
@@ -343,8 +343,6 @@ INNER JOIN Aeroplane AS A ON SR."Aeroplane_ID" = A."Registration_Number";
 
 SELECT * 
 FROM ServiceHistory;
-
-
 
 
 
